@@ -21,14 +21,23 @@ module.exports = async function (callback) {
     // get the current network name to display in the log
     const network = await web3.eth.net.getNetworkType();
 
-    console.log(PUBLIC_ADDRESS);
+    const approve = contractToken.methods.approve(
+        contractDex.options.address,
+        web3.utils.toWei('100', 'ether'));
 
-    const isAddy = await web3.utils.isAddress(PUBLIC_ADDRESS);
+    await approve
+        .send({
+            from: (await web3.eth.getAccounts())[0]
+        })
+        .then(function (receipt) {
 
-    console.log(isAddy);
+            console.log(receipt);
+
+        });
+
 
     // Generate a transaction to calls the `mint` function
-    const tx1155 = contractToken.methods.mint(PUBLIC_ADDRESS, 20);
+    const tx1155 = contractToken.methods.mint(PUBLIC_ADDRESS, web3.utils.toWei('1', 'ether'));
     // Send the transaction to the network
     await tx1155
         .send({
@@ -36,7 +45,7 @@ module.exports = async function (callback) {
             gas: await tx1155.estimateGas(),
         })
         .on("transactionHash", (txhash) => {
-            console.log(`Mining ERC-1155 transaction for 2 NFTs and fungible tokens ...`);
+            console.log(`Minting ERC-20 transaction...`);
             console.log(`https://${network}.etherscan.io/tx/${txhash}`);
         })
         .on("error", function (error) {
@@ -55,9 +64,13 @@ module.exports = async function (callback) {
     contractToken.methods.balanceOf(PUBLIC_ADDRESS)
         .call()
         .then(function (receipt) {
-            console.log("AvaxTestToken balance: " + receipt);
-            callback();
+            console.log("AvaxTestToken balance: " + web3.utils.fromWei(receipt, 'ether'));
         });
 
-
+    contractToken.methods.allowance(PUBLIC_ADDRESS,contractDex.options.address)
+        .call()
+        .then(function (receipt) {
+            console.log("Allowance: " + web3.utils.fromWei(receipt, 'ether'));
+            callback();
+        });
 };

@@ -131,7 +131,7 @@ contract Dex {
         liquidity[msg.sender] = liquidity[msg.sender].add(liquidityMinted);
         totalLiquidity = totalLiquidity.add(liquidityMinted);
 
-        require(token.transferFrom(msg.sender, address(this), tokenDeposit));
+        //require(token.transferFrom(msg.sender, address(this), tokenDeposit));
         emit LiquidityProvided(msg.sender, liquidityMinted, msg.value, tokenDeposit);
         return tokenDeposit;
     }
