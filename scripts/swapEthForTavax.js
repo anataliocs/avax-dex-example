@@ -21,7 +21,7 @@ module.exports = async function (callback) {
     // get the current network name to display in the log
     const network = await web3.eth.net.getNetworkType();
 
-    const initTx = contractDex.methods.deposit();
+    const initTx = contractDex.methods.ethToToken();
     // Send the transaction to the network
     await initTx
         .send({
@@ -31,19 +31,32 @@ module.exports = async function (callback) {
         })
         .on("error", function (error) {
             console.error(`An error happened: ${error}`);
+            callback();
         })
         .then(function (receipt) {
 
-            console.log("Event: " + receipt.events.LiquidityProvided.event);
-            console.log("Liquidity Provider: " + receipt.events.LiquidityProvided.returnValues.liquidityProvider);
-            console.log("TAVAX Deposited: " + web3.utils.fromWei(receipt.events.LiquidityProvided.returnValues.tokensInput, 'ether') + " TAVAX");
-            console.log("ETH Deposited: " + web3.utils.fromWei(receipt.events.LiquidityProvided.returnValues.ethInput, 'ether') + " ETH");
+            console.log("Event: " + receipt.events.EthToTokenSwap.event);
+            console.log("Swapper: " + receipt.events.EthToTokenSwap.returnValues.swapper);
+            console.log("Tx Details: " + receipt.events.EthToTokenSwap.returnValues.txDetails);
+            console.log("ETH Input: " + web3.utils.fromWei(receipt.events.EthToTokenSwap.returnValues.ethInput, 'ether'));
+            console.log("Token Output: " + web3.utils.fromWei(receipt.events.EthToTokenSwap.returnValues.tokenOutput, 'ether'));
         });
 
     await contractDex.methods.getLiquidity(PUBLIC_ADDRESS)
         .call()
         .then(function (receipt) {
             console.log("\nDex Liquidity: " + web3.utils.fromWei(receipt, 'ether'));
+        });
+
+    await web3.eth.getBalance((await web3.eth.getAccounts())[0])
+        .then(function (receipt) {
+            console.log("\nETH Balance(After Swap): " + web3.utils.fromWei(receipt, 'ether'));
+        });
+
+    await contractToken.methods.balanceOf(PUBLIC_ADDRESS)
+        .call()
+        .then(function (receipt) {
+            console.log("AvaxTestToken balance(After Swap): " + web3.utils.fromWei(receipt, 'ether'));
             callback();
         });
 };

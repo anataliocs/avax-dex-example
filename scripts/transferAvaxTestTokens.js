@@ -50,6 +50,4 @@ module.exports = async function (callback) {
             console.log("Dex Allowance: " + web3.utils.fromWei(receipt, 'ether'));
 
         });
-
-
 };

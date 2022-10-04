@@ -31,19 +31,11 @@ module.exports = async function (callback) {
         })
         .on("error", function (error) {
             console.error(`An error happened: ${error}`);
+            callback();
         })
         .then(function (receipt) {
 
-            console.log("Event: " + receipt.events.LiquidityProvided.event);
-            console.log("Liquidity Provider: " + receipt.events.LiquidityProvided.returnValues.liquidityProvider);
-            console.log("TAVAX Deposited: " + web3.utils.fromWei(receipt.events.LiquidityProvided.returnValues.tokensInput, 'ether') + " TAVAX");
-            console.log("ETH Deposited: " + web3.utils.fromWei(receipt.events.LiquidityProvided.returnValues.ethInput, 'ether') + " ETH");
-        });
-
-    await contractDex.methods.getLiquidity(PUBLIC_ADDRESS)
-        .call()
-        .then(function (receipt) {
-            console.log("\nDex Liquidity: " + web3.utils.fromWei(receipt, 'ether'));
+            console.log(receipt);
             callback();
         });
 };
