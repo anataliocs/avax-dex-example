@@ -18,59 +18,38 @@ module.exports = async function (callback) {
         CONTRACT_ADDRESS_TOKEN // this is the address generated when running migrate
     );
 
+    console.log(contractDex.options.address);
+
     // get the current network name to display in the log
     const network = await web3.eth.net.getNetworkType();
 
     const approve = contractToken.methods.approve(
         contractDex.options.address,
-        web3.utils.toWei('100', 'ether'));
+        web3.utils.toWei('10000', 'ether'));
 
     await approve
         .send({
             from: (await web3.eth.getAccounts())[0]
         })
         .then(function (receipt) {
-
-            console.log(receipt);
-
+            console.log("Event: " + receipt.events.Approval.event);
+            console.log("Owner: " + receipt.events.Approval.returnValues.owner);
+            console.log("Spender: " + receipt.events.Approval.returnValues.spender);
+            console.log("Value: " + web3.utils.fromWei(receipt.events.Approval.returnValues.value, 'ether'));
         });
 
-
-    // Generate a transaction to calls the `mint` function
-    const tx1155 = contractToken.methods.mint(PUBLIC_ADDRESS, web3.utils.toWei('1', 'ether'));
-    // Send the transaction to the network
-    await tx1155
-        .send({
-            from: (await web3.eth.getAccounts())[0], // uses the first account in the HD wallet
-            gas: await tx1155.estimateGas(),
-        })
-        .on("transactionHash", (txhash) => {
-            console.log(`Minting ERC-20 transaction...`);
-            console.log(`https://${network}.etherscan.io/tx/${txhash}`);
-        })
-        .on("error", function (error) {
-            console.error(`An error happened: ${error}`);
-            callback();
-        })
-        .then(function (receipt) {
-            // Success, you've minted the NFT. The transaction is now on chain!
-            console.log(
-                `\n Success: ERC-20 NFTs tokens have been minted and mined in block ${receipt.blockNumber} which cost ${receipt.gasUsed} gas \n`
-            );
-            console.log("# of tokens transferred: " + receipt.events.Transfer.returnValues.value);
-
-        });
-
-    contractToken.methods.balanceOf(PUBLIC_ADDRESS)
+    await contractToken.methods.balanceOf(PUBLIC_ADDRESS)
         .call()
         .then(function (receipt) {
-            console.log("AvaxTestToken balance: " + web3.utils.fromWei(receipt, 'ether'));
+            console.log("\nAvaxTestToken balance: " + web3.utils.fromWei(receipt, 'ether'));
         });
 
-    contractToken.methods.allowance(PUBLIC_ADDRESS,contractDex.options.address)
+    await contractToken.methods.allowance(PUBLIC_ADDRESS,contractDex.options.address)
         .call()
         .then(function (receipt) {
-            console.log("Allowance: " + web3.utils.fromWei(receipt, 'ether'));
-            callback();
+            console.log("Dex Allowance: " + web3.utils.fromWei(receipt, 'ether'));
+
         });
+
+
 };

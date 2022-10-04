@@ -21,36 +21,21 @@ module.exports = async function (callback) {
     // get the current network name to display in the log
     const network = await web3.eth.net.getNetworkType();
 
-    // Generate a transaction to calls the `mint` function
-    const tx1155 = contractDex.methods.init(web3.utils.toWei('10', 'ether'));
+    const initTx = contractDex.methods.deposit();
     // Send the transaction to the network
-    await tx1155
+    await initTx
         .send({
             value: web3.utils.toWei('1', 'ether'),
-            from: (await web3.eth.getAccounts())[0], // uses the first account in the HD wallet
-            gas: await tx1155.estimateGas()
-        })
-        .on("transactionHash", (txhash) => {
-            console.log(`Mining ERC-1155 transaction for 2 NFTs and fungible tokens ...`);
-            console.log(`https://${network}.etherscan.io/tx/${txhash}`);
+            from: (await web3.eth.getAccounts())[0],
+            gasLimit: 200000
         })
         .on("error", function (error) {
             console.error(`An error happened: ${error}`);
             callback();
         })
         .then(function (receipt) {
-            // Success, you've minted the NFT. The transaction is now on chain!
-            console.log(
-                `\n Success: ERC-20 NFTs tokens have been minted and mined in block ${receipt.blockNumber} which cost ${receipt.gasUsed} gas \n`
-            );
-            console.log("# of tokens transferred: " + receipt.events.Transfer.returnValues.value);
 
-        });
-
-    contractToken.methods.balanceOf(PUBLIC_ADDRESS)
-        .call()
-        .then(function (receipt) {
-            console.log("AvaxTestToken balance: " + receipt);
+            console.log(receipt);
             callback();
         });
 };
