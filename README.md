@@ -1,10 +1,6 @@
-# NFT-Standards
+# Avalanche DEX example
 
-ERC-721 vs ERC-721a vs ERC-1155
-
-We will review different NFT Implementations to help you decide which to use for your project.
-
-Additionally, we will go into how to ensure NFT and contract metadata shows up correctly on Opensea.  We will mint NFTs on various standards, review the gas costs and view the transactions and resulting NFTs.
+Avalanche DEX Example
 
 - [Companion Article](https://blog.infura.io/post/comparing-nft-standards-erc-721-vs-erc-721a-vs-erc-1155)
 - [Sign up for a free account with Infura](https://infura.io/register?utm_source=github&utm_medium=devcommunity&utm_campaign=2022_Jul_devrel-sample-projects_content_content).
@@ -80,33 +76,6 @@ You will save both these credentials into an .env file.
 
 ![ipfs-creds-infura](img/ipfs-creds-infura.png)
 
-### Upload Image data to IPFS
-
-Find a sample image you'd like to upload to IPFS.
-
-You can use the  [Infura IPFS upload tool](https://blog.infura.io/post/ipfs-file-upload-client-tool) to upload images.
-
-Check out the following for more info: [IPFS Client upload article](https://blog.infura.io/post/ipfs-file-upload-client-tool).
-
-Or you can use basic cURL commands.
-
-From your project root, run the follow `curl`command to upload the image. Make sure to modify the `curl` script to add the `Project Secret`and`Project ID` from your **IPFS project**, not your Rinkeby project.
-
-```curl
-curl "https://ipfs.infura.io:5001/api/v0/add" \
--X POST \
--F file=@"/img/meme-nft.json" \
--u "<Project-ID>:<Project-Secret>"
-```
-
-You will receive something like below. The Hash is the IPFS Content ID (CID) which we will use to identify our asset.
-
-```bash
--X POST \
--F file=@"./img/meme-nft.jpeg" \
--u "<Project-ID>:<Project-Secret>"
-{"Name":"meme-nft.jpeg","Hash":"QmW5sPVbZDueZwvSuibteAwDFwFXhF8gebfptGBx1DZq1j","Size":"78353"}
-```
 
 #### Install hdwallet-provider
 
@@ -183,15 +152,15 @@ Go to [faucet.paradigm.xyz/](https://faucet.paradigm.xyz/) and add your address 
 
 Let's now write the script for deployment to the Rinkeby test network.
 
-Navigate to the root of your project directory and create the `2_deployInfura721.js` file.
+Navigate to the root of your project directory and create the `2_deployAvaxTestToken.js` file.
 
 ```bash
-touch ./migrations/2_deployInfura721.js
+touch ./migrations/2_deployAvaxTestToken.js
 ```
 
 The deployment scripts are numbered in the order we wish to deploy them.
 
-Inside `2_deployInfura721.js` add:
+Inside `2_deployAvaxTestToken.js` add:
 
 ```javascript
 var InfuraNFT = artifacts.require("InfuraNFT");
