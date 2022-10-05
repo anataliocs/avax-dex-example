@@ -18,8 +18,6 @@ module.exports = async function (callback) {
         CONTRACT_ADDRESS_TOKEN // this is the address generated when running migrate
     );
 
-    console.log(contractDex.options.address);
-
     // get the current network name to display in the log
     const network = await web3.eth.net.getNetworkType();
 

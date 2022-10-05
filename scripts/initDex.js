@@ -21,7 +21,7 @@ module.exports = async function (callback) {
     // get the current network name to display in the log
     const network = await web3.eth.net.getNetworkType();
 
-    const initTx = contractDex.methods.deposit();
+    const initTx = contractDex.methods.init(web3.utils.toWei('1', 'ether'));
     // Send the transaction to the network
     await initTx
         .send({
@@ -29,13 +29,14 @@ module.exports = async function (callback) {
             from: (await web3.eth.getAccounts())[0],
             gasLimit: 200000
         })
-        .on("error", function (error) {
-            console.error(`An error happened: ${error}`);
-            callback();
-        })
         .then(function (receipt) {
+            console.log("Transaction Hash: " + receipt.transactionHash);
+        });
 
-            console.log(receipt);
+    await contractDex.methods.getLiquidity(PUBLIC_ADDRESS)
+        .call()
+        .then(function (receipt) {
+            console.log("\nDex Liquidity: " + web3.utils.fromWei(receipt, 'ether'));
             callback();
         });
 };

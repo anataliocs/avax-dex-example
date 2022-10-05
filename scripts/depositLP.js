@@ -29,9 +29,6 @@ module.exports = async function (callback) {
             from: (await web3.eth.getAccounts())[0],
             gasLimit: 200000
         })
-        .on("error", function (error) {
-            console.error(`An error happened: ${error}`);
-        })
         .then(function (receipt) {
 
             console.log("Event: " + receipt.events.LiquidityProvided.event);

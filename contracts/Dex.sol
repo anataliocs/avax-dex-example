@@ -46,7 +46,7 @@ contract Dex {
 
     /* ========== CONSTRUCTOR ========== */
 
-    constructor(address token_addr) public {
+    constructor(address token_addr) {
         token = IERC20(token_addr); //specifies the token address that will hook into the interface and be used through the variable 'token'
     }
 
@@ -72,7 +72,7 @@ contract Dex {
         uint256 xInput,
         uint256 xReserves,
         uint256 yReserves
-    ) public view returns (uint256 yOutput) {
+    ) public pure returns (uint256 yOutput) {
         uint256 xInputWithFee = xInput.mul(997);
         uint256 numerator = xInputWithFee.mul(yReserves);
         uint256 denominator = (xReserves.mul(1000)).add(xInputWithFee);

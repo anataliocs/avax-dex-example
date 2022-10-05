@@ -6,7 +6,6 @@ Avalanche DEX Example
 - [Sign up for a free account with Infura](https://infura.io/register?utm_source=github&utm_medium=devcommunity&utm_campaign=2022_Jul_devrel-sample-projects_content_content).
 - [Getting Started with Infura](https://blog.infura.io/post/getting-started-with-infura-28e41844cc89)
 
-
 ## Module 1: Setup
 
 Setting up your local development environment.
@@ -26,7 +25,7 @@ Add env config:
 npx yarn add dotenv
 ```
 
-Add the Infura credentials
+Add the Infura credentials:
 
 ```text
 # Secret recovery phrase - NEVER EVER SHARE
@@ -36,9 +35,6 @@ MNEMONIC= Add your 12 word secret phrase to access your assets on Ethereum. Neve
 INFURA_PROJECT_ID= Add your secret here. (No qoutations)
 INFURA_PROJECT_SECRET=Add your ID here. (No quotations)
 
-# IPFS Project details
-INFURA_IPFS_PROJECT_ID= Add IPFS project id (No qoutations)
-INFURA_IPFS_SECRET= Same for IPFS secret (No qoutations)
 ```
 
 ### MetaMask Setup
@@ -150,46 +146,10 @@ Go to [faucet.paradigm.xyz/](https://faucet.paradigm.xyz/) and add your address 
 
 ## Module 3: Deployment
 
-Let's now write the script for deployment to the Rinkeby test network.
-
-Navigate to the root of your project directory and create the `2_deployAvaxTestToken.js` file.
-
-```bash
-touch ./migrations/2_deployAvaxTestToken.js
-```
-
-The deployment scripts are numbered in the order we wish to deploy them.
-
-Inside `2_deployAvaxTestToken.js` add:
-
-```javascript
-var InfuraNFT = artifacts.require("InfuraNFT");
-
-module.exports = function (deployer) {
-  // deployment steps
-  deployer.deploy(InfuraNFT);
-};
-```
-
 Now we can deploy our contract to Rinkeby test network!
 
 ```bash
-truffle migrate --network rinkeby
-```
-
-![send-tx.gif](/img/send-rinkeby.gif)
-
-You have just completed your first transaction!
-
-Wait until the transactions is finished in about 15 seconds. Then, run the above command again.
-
-```bash
-truffle migrate --network rinkeby
-```
-
-Replace deployed contract on testnet
-```
-truffle migrate --reset --network rinkeby
+truffle migrate --network 
 ```
 
 ### Update .env file
@@ -197,75 +157,104 @@ truffle migrate --reset --network rinkeby
 Let's update our `.env` file to account for our NFT metadata:
 
 ```text
-
 # Address of the deployed smart contract
 CONTRACT_ADDRESS="0x47DC746F41c5dB584e5A6ccf15c2c161560cD0F7"
-
-# Public address to assign NFT mint to
-# Use address 1 in your MetaMask account
-PUBLIC_ADDRESS="<Public-Address-Of-The-Account-To-Send-NFT-To>"
 ```
 
-### Module 4: Minting the NFT
+### Module 4: Interacting with the DEX
 
-#### Creating the Minting script
+Now let's work with our deployed dex and ERC-20 token contracts to:
+- Approve the contract
+- Bootstrap liquidity
+- Deposit to the Liquidity Pool(LP)
+- Swap our token for ETH
 
-Let's mint our cool NFT! We will do so in a programmatic way using a minting script.
+#### Approve the DEX contract
 
-Create a `/scripts` directory in the project's root directory and enter the said directory.
+Run the following script to approve the ERC-20 token on the DEX.
 
 ```bash
-mkdir scripts && cd ./scripts
+npx truffle exec scripts/approveContract.js --network 
 ```
 
-Next lets create the `mintSingleNFT.js` script
+This script will create a web3.js Contract object for the deployed ERC-20 token contract, `AvaxTestToken.sol` that calls the approve() function `contractToken.methods.approve` 
+and approves the deployed Dex contract to spend the ERC-20 token, Avax Test Token, in your wallet, up to the specified allowance.  This should emit an event which is
+then logged out to console.
 
 ```bash
-touch mintSingleNFT.js
+Event: Approval
+Owner: 0xdf997dd8d5ecb45f4568bEF6791B0E59c2A51886
+Spender: 0x726eD59088fcB5874d2d0cB4e458D326755CCF27
+Value: 10000
+
+AvaxTestToken balance: 99987.434999733274405172
+Dex Allowance: 10000
 ```
 
-##### Finally, lets mint the NFT
+#### Bootstrap liquidity on the DEX contract
 
-Run the following script
+Run the following script to bootstrap the DEX with an initial pool of liquidity.
 
 ```bash
-npx truffle exec scripts/mintSingleNFT.js --network rinkeby
+npx truffle exec scripts/initDex.js --network 
 ```
 
-Once you run the script, wait about 15 to 30 seconds. You should see something similar to:
+This script will create a web3.js Contract object that calls the `payable` init() function `contractDex.methods.init` on the deployed Dex contract, 
+`Dex.sol` and bootstraps the Dex contract with initial liquidity consisting of 1-to-1 ERC-20 token, Avax Test Token, and ETH.  This should emit an event which is
+then logged out to console.
+
+```
+Transaction Hash: 0x3613dcb9531c469ab2d1a7bd8d0888ef1a09377cb62576f24d2586cf2c7e905e
+
+Dex Liquidity: 1
+```
+
+#### Deposit to the LP on the DEX contract
+
+Run the following script to deposit your token pair TAVAX/ETH to the DEX LP.
 
 ```bash
-Using network 'rinkeby'.
-
-Mining transaction ...
-https://rinkeby.etherscan.io/tx/0x6992baf3056a6fd486be3ddbbbef2a0f856e3b8d6f7c988656acf85fe6119754
-Success: The NFT has been minted and mined in block 10893060
+npx truffle exec scripts/depositLP.js --network 
 ```
 
-Viola! You have minted a new NFT!
+This script will create a web3.js Contract object that calls the `payable` deposit() function `contractDex.methods.deposit` on the deployed Dex contract,
+`Dex.sol` and deposits to the existing TAVAX/ETH LP with a 1-to-1 ratio of ERC-20 token, Avax Test Token, and ETH.  This should emit a `LiquidityProvided`
+event which is then logged out to console.
 
-You can check your NFT through various ways:
-
-### View via EtherScan
-
-Via EtherScan: Copy and paste the outputted console message to view the transaction reciept.
-
-#### View via OpenSea
-
-Via OpenSea: Go to [https://testnets.opensea.io/](https://testnets.opensea.io/) and log in with your development MetaMask Account.
-
-#### NFT Metadata for Opensea
-
-Let's create the metadata file
-
-Example metadata:
-
-```javascript
-{
-  "description": "So Hot, NFT Demo",
-  "external_url": "https://spooderman.infura-ipfs.io/ipfs/QmW5sPVbZDueZwvSuibteAwDFwFXhF8gebfptGBx1DZq1j",
-  "image": "https://spooderman.infura-ipfs.io/ipfs/QmW5sPVbZDueZwvSuibteAwDFwFXhF8gebfptGBx1DZq1j",
-  "name": "MyNFT - So Hot!",
-  "background_color": "#FFF"
-}
 ```
+Event: LiquidityProvided
+Liquidity Provider: 0xdf997dd8d5ecb45f4568bEF6791B0E59c2A51886
+TAVAX Deposited: 1.251485871078270025 TAVAX
+ETH Deposited: 1 ETH
+
+Dex Liquidity: 13.754457613234810075
+```
+
+#### Swap ETH for TAVAX
+
+Run the following script to swap ETH for TAVAX using the DEX.
+
+```bash
+npx truffle exec scripts/swapEthForTavax.js --network 
+```
+
+This script will create a web3.js Contract object that calls the `payable` ethToToken() function `contractDex.methods.ethToToken` on the deployed Dex contract,
+`Dex.sol` and uses the existing TAVAX/ETH LP to swap ETH for the ERC-20 token, Avax Test Token.  This should emit a `EthToTokenSwap`
+event which is then logged out to console.
+
+```
+Event: EthToTokenSwap
+Swapper: 0xdf997dd8d5ecb45f4568bEF6791B0E59c2A51886
+Tx Details: Eth to Balloons
+ETH Input: 1
+Token Output: 1.437382812323980889
+
+Dex Liquidity: 13.754457613234810075
+
+ETH Balance(After Swap): 975.941305858221052478
+AvaxTestToken balance(After Swap): 99984.154906454427853183
+```
+
+Congrats! You have just created a liquidity pool(LP) in a dex, deposited into a token/ETH pair on the dex and swapped your token for ETH and vice versa!  You have taken some
+big steps in your DeFi developer journey
+
