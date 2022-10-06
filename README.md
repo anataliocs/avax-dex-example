@@ -2,7 +2,6 @@
 
 Avalanche DEX Example
 
-- [Companion Article](https://blog.infura.io/post/comparing-nft-standards-erc-721-vs-erc-721a-vs-erc-1155)
 - [Sign up for a free account with Infura](https://infura.io/register?utm_source=github&utm_medium=devcommunity&utm_campaign=2022_Jul_devrel-sample-projects_content_content).
 - [Getting Started with Infura](https://blog.infura.io/post/getting-started-with-infura-28e41844cc89)
 
@@ -132,36 +131,26 @@ networks: {
 
 #### Fund Deployment Account
 
-Finally, let get some free Ether to process transactions on the Rinkeby test network.
-
-Ether is required because:
-
-- Without it, public networks accessible by all would run into DDOS attacks.
-- Being able to upload arbitraty logic opens up the network to the the halting problem.
-- independent network operators require incentivization to process computation on the network and pay for their operating costs.
-
-Luckily, for our test networks, Ether is free.
-
-Go to [faucet.paradigm.xyz/](https://faucet.paradigm.xyz/) and add your address to claim Rinkeby Ether.
+Go to [faucet.avax.network](https://faucet.avax.network/) and add your address to claim Fuji AVAX.
 
 ## Module 3: Deployment
 
-Now we can deploy our contract to Rinkeby test network!
+Now we can deploy our contract to Fuji Avalanche test network!
 
 ```bash
-truffle migrate --network 
+truffle migrate --network fuji
 ```
 
 ### Update .env file
 
-Let's update our `.env` file to account for our NFT metadata:
+Let's update our `.env` file:
 
 ```text
 # Address of the deployed smart contract
-CONTRACT_ADDRESS="0x47DC746F41c5dB584e5A6ccf15c2c161560cD0F7"
+CONTRACT_ADDRESS=0x47DC746F41c5dB584e5A6ccf15c2c161560cD0F7
 ```
 
-### Module 4: Interacting with the DEX
+## Module 4: Interacting with the DEX
 
 Now let's work with our deployed dex and ERC-20 token contracts to:
 - Approve the contract
@@ -174,7 +163,7 @@ Now let's work with our deployed dex and ERC-20 token contracts to:
 Run the following script to approve the ERC-20 token on the DEX.
 
 ```bash
-npx truffle exec scripts/approveContract.js --network 
+npx truffle exec scripts/approveContract.js --network fuji
 ```
 
 This script will create a web3.js Contract object for the deployed ERC-20 token contract, `AvaxTestToken.sol` that calls the approve() function `contractToken.methods.approve` 
@@ -257,4 +246,8 @@ AvaxTestToken balance(After Swap): 99984.154906454427853183
 
 Congrats! You have just created a liquidity pool(LP) in a dex, deposited into a token/ETH pair on the dex and swapped your token for ETH and vice versa!  You have taken some
 big steps in your DeFi developer journey
+
+## Next Steps
+
+[Getting Started with Infura](https://testnet.snowtrace.io/)
 

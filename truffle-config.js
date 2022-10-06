@@ -21,6 +21,7 @@
 require("dotenv").config(); // allows usage of .env file to store secrets
 const HDWalletProvider = require("@truffle/hdwallet-provider");
 const infuraURL = `https://rinkeby.infura.io/v3/${process.env.INFURA_PROJECT_ID}`;
+const fujiURL = `https://avalanche-fuji.infura.io/v3/${process.env.INFURA_PROJECT_ID}`;
 const mnemonic = process.env.MNEMONIC;
 
 module.exports = {
@@ -65,12 +66,14 @@ module.exports = {
       timeoutBlocks: 200, // # of blocks before a deployment times out  (minimum/default: 50)
       skipDryRun: true, // Skip dry run before migrations? (default: false for public nets )
     },
-    // Useful for private networks
-    // private: {
-    // provider: () => new HDWalletProvider(mnemonic, `https://network.io`),
-    // network_id: 2111,   // This network is yours, in the cloud.
-    // production: true    // Treats this network as if it was a public net. (default: false)
-    // }
+    fuji: {
+      provider: () => new HDWalletProvider(mnemonic, fujiURL),
+      network_id: 43113,
+      gas: 3000000,
+      gasPrice: 470000000000,
+      timeoutBlocks: 200,
+      skipDryRun: true,
+    },
   },
 
   // Set default mocha options here, use special reporters etc.
